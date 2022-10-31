@@ -10,11 +10,12 @@ from flask_login import login_user, logout_user, login_required, \
     current_user
 from . import auth
 from .. import db
-from ..models import User,LoginLog
+from ..models import User, LoginLog
 from ..email import send_email
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
+from .forms import LoginForm, RegistrationForm, ChangePasswordForm, \
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
 import time
+
 
 @auth.before_app_request
 def before_request():
@@ -26,11 +27,13 @@ def before_request():
                 and request.endpoint != 'static':
             return redirect(url_for('auth.unconfirmed'))
 
+
 @auth.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.index'))
     return render_template('auth/unconfirmed.html')
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -39,29 +42,30 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password("123.com"):
             login_user(user, form.remember_me.data)
-            print (request.headers.get('X-Forwarded-For',request.remote_addr))
-#            login_log = LoginLog()
-#            login_log.login_ip = request.headers.get('X-Forwarded-For',request.remote_addr)
-#            login_log.login_browser = str(request.user_agent)
-#            login_log.login_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+            print(request.headers.get('X-Forwarded-For', request.remote_addr))
+            #            login_log = LoginLog()
+            #            login_log.login_ip = request.headers.get('X-Forwarded-For',request.remote_addr)
+            #            login_log.login_browser = str(request.user_agent)
+            #            login_log.login_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
 
-            #print (login_log)
- #           print(login_log.login_ip,login_log.login_browser,login_log.login_time)
-  
- #           db.session.add(login_log) # 提交
- #           db.session.commit()
+            # print (login_log)
+            #           print(login_log.login_ip,login_log.login_browser,login_log.login_time)
 
-            
+            #           db.session.add(login_log) # 提交
+            #           db.session.commit()
+
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash('Invalid username or password.','danger')
+        flash('Invalid username or password.', 'danger')
     return render_template('auth/login.html', form=form)
+
 
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.',"success")
+    flash('You have been logged out.', "success")
     return redirect(url_for('auth.login'))
+
 
 @auth.route('/register1905', methods=['GET', 'POST'])
 def register():
@@ -75,9 +79,10 @@ def register():
         token = user.generate_confirmation_token()
         send_email(user.email, 'Confirm Your Account',
                    'auth/email/confirm', user=user, token=token)
-        flash('已经向您的邮箱发送了一份确认邮件.','success')
+        flash('已经向您的邮箱发送了一份确认邮件.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
+
 
 @auth.route('/confirm/<token>')
 @login_required
@@ -85,7 +90,7 @@ def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
-        flash('You have confirmed your account. Thanks!',"success")
+        flash('You have confirmed your account. Thanks!', "success")
     else:
         flash('The confirmation link is invalid or has expired.')
     return redirect(url_for('main.index'))
@@ -97,8 +102,9 @@ def resend_confirmation():
     token = current_user.generate_confirmation_token()
     send_email(current_user.email, 'Confirm Your Account',
                'auth/email/confirm', user=current_user, token=token)
-    flash('A new confirmation email has been sent to you by email.',"info")
+    flash('A new confirmation email has been sent to you by email.', "info")
     return redirect(url_for('main.index'))
+
 
 @auth.route('/change-password', methods=['GET', 'POST'])
 @login_required
@@ -113,6 +119,7 @@ def change_password():
         else:
             flash('Invalid password.')
     return render_template("auth/change_password.html", form=form)
+
 
 @auth.route('/reset', methods=['GET', 'POST'])
 def password_reset_request():
@@ -132,6 +139,7 @@ def password_reset_request():
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
 
+
 @auth.route('/reset/<token>', methods=['GET', 'POST'])
 def password_reset(token):
     if not current_user.is_anonymous:
@@ -147,6 +155,7 @@ def password_reset(token):
         else:
             return redirect(url_for('main.index'))
     return render_template('auth/reset_password.html', form=form)
+
 
 @auth.route('/change-email', methods=['GET', 'POST'])
 @login_required
@@ -165,6 +174,7 @@ def change_email_request():
         else:
             flash('Invalid email or password.')
     return render_template("auth/change_email.html", form=form)
+
 
 @auth.route('/change-email/<token>')
 @login_required

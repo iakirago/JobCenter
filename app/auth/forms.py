@@ -10,16 +10,19 @@ from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
 from ..models import User
 
+
 class LoginForm(FlaskForm):
-    email = StringField('邮箱', default="2399447849@qq.com", validators=[Required(), Length(1, 64),
-                                             Email()])
+    email = StringField('邮箱', default="2399447849@qq.com",
+                        validators=[Required(), Length(1, 64),
+                                    Email()])
     password = StringField('密码', default="123.com", validators=[Required()])
     remember_me = BooleanField('保持登录')
     submit = SubmitField('登录')
 
+
 class RegistrationForm(FlaskForm):
     email = StringField('邮箱', validators=[Required(), Length(1, 64),
-                                           Email()])
+                                            Email()])
     username = StringField('用户名', validators=[
         Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                           'Usernames must have only letters, '
@@ -37,6 +40,7 @@ class RegistrationForm(FlaskForm):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already in use.')
 
+
 class ChangePasswordForm(FlaskForm):
     old_password = PasswordField('Old password', validators=[Required()])
     password = PasswordField('New password', validators=[
@@ -44,10 +48,12 @@ class ChangePasswordForm(FlaskForm):
     password2 = PasswordField('Confirm new password', validators=[Required()])
     submit = SubmitField('Update Password')
 
+
 class PasswordResetRequestForm(FlaskForm):
     email = StringField('Email', validators=[Required(), Length(1, 64),
                                              Email()])
     submit = SubmitField('Reset Password')
+
 
 class PasswordResetForm(FlaskForm):
     email = StringField('Email', validators=[Required(), Length(1, 64),
@@ -60,6 +66,7 @@ class PasswordResetForm(FlaskForm):
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first() is None:
             raise ValidationError('Unknown email address.')
+
 
 class ChangeEmailForm(FlaskForm):
     email = StringField('New Email', validators=[Required(), Length(1, 64),

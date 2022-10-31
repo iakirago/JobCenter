@@ -15,7 +15,7 @@ mysql_info = dict(
     port = 3306,
     dbname = 'jobs',
     username = 'root',
-    password = 'guo.150019'
+    password = '123456'
 )
 
 '''
@@ -23,7 +23,7 @@ mysql_info = dict(
     //   t.ajax.reload(); // 刷新表格数据，分页信息不会重置
     // }, 5000 );
 '''
-MYSQL_URL = 'mysql+pymysql://%s:%s@%s:%s/%s?charset=utf8'%(mysql_info['username'],mysql_info['password'],
+MYSQL_URL = 'mysql+pymysql://%s:%s@%s:%s/%s?charset=utf8mb4'%(mysql_info['username'],mysql_info['password'],
                                                            mysql_info['host'],mysql_info['port'],mysql_info['dbname'])
 
 # apscheduler 配置
